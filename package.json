@@ -1,0 +1,10 @@
+{
+  "name": "test-pty-js",
+  "version": "1.0.0",
+  "main": "shell.js",
+  "license": "MIT",
+  "dependencies": {
+    "ioredis": "^4.0.0",
+    "node-pty": "^0.7.7"
+  }
+}
