@@ -2,15 +2,14 @@
 
 const EventEmitter = require('events');
 const Redis = require('ioredis');
-const uuid4 = require('uuid/v4');
 
 class TTYServer extends EventEmitter {
 
-    constructor() {
+    constructor(id) {
 
         super();
 
-        this._id = uuid4();
+        this._id = id;
         this._input = new Redis;
         this._output = new Redis;
         this._eventsIn = new Redis;
@@ -31,9 +30,9 @@ class TTYServer extends EventEmitter {
 
     }
 
-    static async factory() {
+    static async factory(id) {
 
-        let obj = new this;
+        let obj = new this(id);
         await obj.connect();
         return obj;
 
@@ -43,6 +42,8 @@ class TTYServer extends EventEmitter {
 
         await this._input.subscribe(`${this._id}:server-input`);
         await this._eventsIn.subscribe(`${this._id}:events`);
+
+        await this.sendEvent({ name: 'server-create-connection' });
 
     }
 
@@ -66,7 +67,7 @@ class TTYServer extends EventEmitter {
     async destructor() {
 
         await this.sendEvent({
-            name: 'server-closed-connection'
+            name: 'server-close-connection'
         });
 
         await this._input.disconnect();

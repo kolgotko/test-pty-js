@@ -43,6 +43,8 @@ class TTYClient extends EventEmitter {
         await this._output.subscribe(`${this._id}:client-output`);
         await this._eventsIn.subscribe(`${this._id}:events`);
 
+        await this.sendEvent({ name: 'client-create-connection' });
+
     }
 
     get id() { return this._id; }
@@ -65,7 +67,7 @@ class TTYClient extends EventEmitter {
     async destructor() {
 
         await this.sendEvent({
-            name: 'client-closed-connection'
+            name: 'client-close-connection'
         });
 
         await this._input.disconnect();

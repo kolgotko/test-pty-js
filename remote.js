@@ -3,10 +3,11 @@
 'use strict';
 
 const TTYClient = require('./tty-client.js');
+const ttyId = 'test';
 
 (async _ => {
 
-    let tty = await TTYClient.factory('48e107cc-d68e-4a82-beec-aaef4e1dfc71');
+    let tty = await TTYClient.factory(ttyId);
 
     process.stdin.setRawMode(true);
 

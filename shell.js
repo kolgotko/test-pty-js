@@ -5,11 +5,11 @@
 const pty = require('node-pty');
 const TTYServer = require('./tty-server.js');
 const shell = '/bin/sh';
+const ttyId = 'test';
 
 (async _ => {
 
-    let tty = await TTYServer.factory();
-    console.log(tty.id);
+    let tty = await TTYServer.factory(ttyId);
 
     let {
         columns = 80,
