@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "ioredis": "^4.0.0",
-    "node-pty": "^0.7.7"
+    "node-pty": "^0.7.7",
+    "uuid": "^3.3.2"
   }
 }

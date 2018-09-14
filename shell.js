@@ -3,14 +3,13 @@
 'use strict';
 
 const pty = require('node-pty');
-const Redis = require('ioredis');
-const input = new Redis;
-const output = new Redis;
-const eventsIn = new Redis;
-const eventsOut = new Redis;
+const TTYServer = require('./tty-server.js');
 const shell = '/bin/sh';
 
 (async _ => {
+
+    let tty = await TTYServer.factory();
+    console.log(tty.id);
 
     let {
         columns = 80,
@@ -25,13 +24,12 @@ const shell = '/bin/sh';
 
     child.on('data', async chunk => {
 
-        await output.publish('remote_stdout', chunk)
+        await tty.write(chunk);
 
     });
 
     child.on('exit', async (...data) => {
 
-        console.log(data);
         let message = {
             name: 'exit',
             data: {
@@ -39,31 +37,23 @@ const shell = '/bin/sh';
             },
         };
 
-        await eventsOut.publish('events', JSON.stringify(message));
+        await tty.sendEvent(message);
 
         process.exit();
 
     });
 
-    await input.subscribe('remote_stdin');
-    await eventsIn.subscribe('events');
+    tty.on('data', chunk => {
 
-    input.on('message', async (channel, message) => {
-
-        child.write(message);
+        child.write(chunk);
 
     });
 
-    eventsIn.on('message', async (channel, message) => {
+    tty.on('resize', async event => {
 
-        let event = JSON.parse(message);
-        if (event.name === 'resize') {
+        let {columns, rows} = event.data;
 
-            let {columns, rows} = event.data;
-
-            child.resize(columns, rows);
-
-        }
+        child.resize(columns, rows);
 
     });
 
